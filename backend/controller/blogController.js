@@ -45,10 +45,10 @@ const postBlog = asyncHandler(async (req, res) => {
 
 const updateBlog = asyncHandler(async (req, res) => {
   const blog = await Blogs.findById(req.params.blogID);
-  // if (!blog) {
-  //   res.status(400);
-  //   throw new Error("Blog not found");
-  // }
+  if (!blog) {
+    res.status(400);
+    throw new Error("Blog not found");
+  }
   const updatedBlog = await Blogs.findByIdAndUpdate(
     req.params.blogID,
     req.body,
