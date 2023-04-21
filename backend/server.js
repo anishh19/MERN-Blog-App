@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: "false" }));
 
 //api route from file
-app.use("/api/blogs", require("./routes/blogPosts"));
+app.use("/api/blogs", require("./routes/blogRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
 
 app.use(errorHandler);

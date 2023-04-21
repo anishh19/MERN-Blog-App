@@ -29,26 +29,44 @@ const registerUser = asyncHandler(async (req, res) => {
           _id: user.ID,
           name: user.name,
           email: user.email,
+          token: generateToken(user._id),
         });
       } else {
         res.status(400);
-        throw new Error({
-          message: "Invalid User Data",
-        });
+        throw new Error((message = "Invalid User Data"));
       }
     }
   }
 });
 
-const loginUser = (req, res) => {
-  res.json({
-    message: "Login User",
-  });
-};
+const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+  if (user && (await bcrypt.compare(password, user.password))) {
+    res.status(201).json({
+      _id: user.ID,
+      name: user.name,
+      email: user.email,
+      token: generateToken(user._id),
+    });
+  } else {
+    res.status(400);
+    throw new Error((message = "Invalid Credentials"));
+  }
+});
 
-const getMe = (req, res) => {
-  res.json({
-    message: "Users Data",
+const getMe = asyncHandler(async (req, res) => {
+  const { _id, name, email } = await User.findById(req.user.id);
+  res.status(200).json({
+    id: _id,
+    name: name,
+    email: email,
+  });
+});
+
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_secret, {
+    expiresIn: "20d",
   });
 };
 

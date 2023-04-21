@@ -1,5 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const Blogs = require("../models/blogsModel");
+const User = require("../models/userModel");
 
 const getBlogs = async (req, res) => {
   const blogs = await Blogs.find();
@@ -7,9 +8,8 @@ const getBlogs = async (req, res) => {
 };
 
 const getBlogsByUser = asyncHandler(async (req, res) => {
-  res
-    .status(200)
-    .json({ message: `Get all blogs by user ${req.params.userID}` });
+  const blogs = await Blogs.find({ user: req.params.userID });
+  res.status(200).json(blogs);
 });
 
 const getBlogsByID = asyncHandler(async (req, res) => {
@@ -26,8 +26,21 @@ const deleteBlog = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Blog not found");
   } else {
-    await Blogs.remove();
-    res.status(200).json({ id: req.params.blogID });
+    const user = await User.findById(req.user.id);
+
+    //check for user
+    if (!user) {
+      res.status(401);
+      throw new Error((message = "User not found"));
+    }
+    //make sure the logged in user matches the blog poster
+    if (blog.user.user.toString() !== user.id) {
+      res.status(401);
+      throw new Error((message = "User not authorised"));
+    } else {
+      await blog.remove();
+      res.status(200).json({ id: req.params.blogID });
+    }
   }
 });
 
@@ -37,6 +50,7 @@ const postBlog = asyncHandler(async (req, res) => {
     throw new Error("Please fill all fields!");
   }
   const blog = await Blogs.create({
+    user: req.user.id,
     title: req.body.title,
     text: req.body.text,
   });
@@ -49,15 +63,28 @@ const updateBlog = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Blog not found");
   }
-  const updatedBlog = await Blogs.findByIdAndUpdate(
-    req.params.blogID,
-    req.body,
-    {
-      new: true,
-    }
-  );
+  const user = await User.findById(req.user.id);
 
-  res.status(200).json(updatedBlog);
+  //check for user
+  if (!user) {
+    res.status(401);
+    throw new Error((message = "User not found"));
+  }
+  //make sure the logged in user matches the blog poster
+  if (blog.user.toString() !== user.id) {
+    res.status(401);
+    throw new Error((message = "User not authorised"));
+  } else {
+    const updatedBlog = await Blogs.findByIdAndUpdate(
+      req.params.blogID,
+      req.body,
+      {
+        new: true,
+      }
+    );
+
+    res.status(200).json(updatedBlog);
+  }
 });
 
 module.exports = {
