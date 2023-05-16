@@ -1,6 +1,11 @@
-import Header from ".@component/components/header";
+import Header from "../components/header";
 import { z } from "zod";
+import { useEffect } from "react";
 import { useFormik } from "formik";
+import { useDispatch, useSelector } from "react-redux";
+import { login, reset } from "../redux/auth/authSlice";
+import { useRouter } from "next/router";
+import { toast } from "react-toastify";
 
 const LoginFormSchema = z.object({
   email: z
@@ -13,7 +18,13 @@ const LoginFormSchema = z.object({
     .min(8, { message: "Password should be atleast 8 characters long!" }),
 });
 
-function login() {
+function Login() {
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const { user, isLoading, isError, isSuccess, message } = useSelector(
+    (state) => state.auth
+  );
+
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -42,14 +53,28 @@ function login() {
       if (errors) return errors;
     },
     onSubmit: (values) => {
-      console.log(values);
+      const userData = {
+        email: values.email,
+        password: values.password,
+      };
+      console.log("Login Attempted", userData);
+      dispatch(login(userData));
     },
   });
+  useEffect(() => {
+    if (isError) {
+      toast.error(message);
+    }
+    if (isSuccess) {
+      router.push("/");
+    }
+    dispatch(reset());
+  }, [user, isLoading, isError, isSuccess, message]);
   return (
-    <div className="h-full w-screem">
+    <div className="h-full w-screen text-gray-500">
       <Header currentTab="login" />
       <div className=" w-full flex flex-col items-center justify-center gap-4 py-8">
-        <h1 className="text-6xl py-12">WELCOME </h1>
+        <h1 className="text-6xl text-indigo-500 py-12">WELCOME </h1>
         <form
           className="flex text-2xl flex-col gap-4 w-[80]"
           onSubmit={formik.handleSubmit}
@@ -93,7 +118,7 @@ function login() {
 
           <button
             type="submit"
-            className="h-16 my-4 bg-slate-600 rounded-md text-white"
+            className="h-16 my-4 bg-indigo-500 rounded-md text-white"
           >
             Login
           </button>
@@ -103,4 +128,4 @@ function login() {
   );
 }
 
-export default login;
+export default Login;

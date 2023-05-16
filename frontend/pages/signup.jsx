@@ -1,9 +1,13 @@
-import Header from ".@component/components/header";
-import { useState } from "react";
+import Header from "../components/header";
+import { useEffect } from "react";
 import { z } from "zod";
 import { useFormik } from "formik";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { register, reset } from "../redux/auth/authSlice";
+import { useRouter } from "next/router";
 
-const LoginFormSchema = z.object({
+const SignUpFormSchema = z.object({
   name: z.string().min(1, { message: "Name is required!" }),
   email: z
     .string()
@@ -17,6 +21,12 @@ const LoginFormSchema = z.object({
 });
 
 function Signup() {
+  const router = useRouter();
+  const dispatch = useDispatch();
+
+  const { user, isLoading, isError, isSuccess, message } = useSelector(
+    (state) => state.auth
+  );
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -34,21 +44,21 @@ function Signup() {
       let errors = {};
 
       try {
-        LoginFormSchema.shape.email.parse(values.email);
+        SignUpFormSchema.shape.email.parse(values.email);
       } catch (err) {
         const errorMessage = err.issues[0].message;
         errors.email = errorMessage;
       }
 
       try {
-        LoginFormSchema.shape.name.parse(values.name);
+        SignUpFormSchema.shape.name.parse(values.name);
       } catch (err) {
         const errorMessage = err.issues[0].message;
         errors.name = errorMessage;
       }
 
       try {
-        LoginFormSchema.shape.password.parse(values.password);
+        SignUpFormSchema.shape.password.parse(values.password);
       } catch (err) {
         const errorMessage = err.issues[0].message;
         errors.password = errorMessage;
@@ -59,15 +69,31 @@ function Signup() {
       if (errors) return errors;
     },
     onSubmit: (values) => {
-      console.log(values);
+      const userData = {
+        name: values.name,
+        email: values.email,
+        password: values.password,
+      };
+      dispatch(register(userData));
     },
   });
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(message);
+    }
+    if (isSuccess) {
+      router.push("/");
+    }
+    dispatch(reset());
+  }, [user, isLoading, isError, isSuccess, message]);
+
   return (
-    <div className="h-full w-screem">
+    <div className="h-full w-screen text-gray-500">
       <Header currentTab="signup" />
 
       <div className=" w-full flex flex-col items-center justify-center gap-2">
-        <h1 className="text-4xl py-4">WELCOME </h1>
+        <h1 className="text-6xl text-indigo-500 py-4">WELCOME </h1>
         <form
           className="flex text-xl flex-col w-[80] gap-1"
           onSubmit={formik.handleSubmit}
@@ -149,7 +175,7 @@ function Signup() {
 
           <button
             type="submit"
-            className="h-16 my-8 bg-slate-600 rounded-md text-white"
+            className="h-16 my-8 bg-indigo-500 rounded-md text-white"
           >
             Sign Up
           </button>

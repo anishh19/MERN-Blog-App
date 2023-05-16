@@ -1,4 +1,4 @@
-import Header from ".@component/components/header";
+import Header from "../components/header";
 function Categories() {
   return (
     <div>
