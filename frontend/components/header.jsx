@@ -57,6 +57,16 @@ function Header({ currentTab }) {
         >
           ABOUT
         </Link>
+        <Link
+          href="/createblog"
+          className={
+            currentTab == "createblog"
+              ? "  text-indigo-500 border-indigo-500"
+              : ""
+          }
+        >
+          CREATE BLOG
+        </Link>
       </div>
 
       <div className="text-xl p-2">

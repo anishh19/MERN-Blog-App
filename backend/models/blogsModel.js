@@ -11,7 +11,11 @@ const blogSchema = mongoose.Schema(
       type: String,
       required: [true, "Please add a title to your blog!"],
     },
-    text: {
+    tags: {
+      type: [String],
+      required: true,
+    },
+    body: {
       type: String,
       required: [true, "Please add content to your blog!"],
     },
