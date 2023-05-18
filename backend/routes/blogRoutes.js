@@ -20,6 +20,6 @@ router
   .put(protect, updateBlog)
   .delete(protect, deleteBlog);
 
-router.post("/post/", protect, postBlog);
+router.post("/post", protect, postBlog);
 
 module.exports = router;

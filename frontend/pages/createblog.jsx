@@ -1,6 +1,10 @@
 import Header from "../components/header";
-import { Formik } from "formik";
+import { useFormik } from "formik";
 import { z } from "zod";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/router";
+import { createBlog } from "../redux/blogs/blogSlice";
 
 const BlogFormSchema = z.object({
   title: z.string().min(1, { message: "Please add a title to your blog!" }),
@@ -8,13 +12,80 @@ const BlogFormSchema = z.object({
   tags: z.string().min(1, { message: "Please add tags" }),
   body: z.string().min(1, { message: "Please give your blog a body" }),
 });
+
 const Createblog = () => {
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const { user } = useSelector((state) => state.auth);
+  const [isLoggedIn, setLogin] = useState(false);
+  const formik = useFormik({
+    initialValues: {
+      title: "",
+      description: "",
+      tags: "",
+      body: "",
+    },
+    initialErrors: {
+      title: "",
+      description: "",
+      tags: "",
+      body: "",
+    },
+    validate: (values) => {
+      let errors = {};
+
+      try {
+        BlogFormSchema.shape.title.parse(values.title);
+      } catch (err) {
+        const errorMessage = err.issues[0].message;
+        errors.title = errorMessage;
+      }
+      try {
+        BlogFormSchema.shape.description.parse(values.description);
+      } catch (err) {
+        const errorMessage = err.issues[0].message;
+        errors.description = errorMessage;
+      }
+      try {
+        BlogFormSchema.shape.tags.parse(values.tags);
+      } catch (err) {
+        const errorMessage = err.issues[0].message;
+        errors.tags = errorMessage;
+      }
+      try {
+        BlogFormSchema.shape.body.parse(values.body);
+      } catch (err) {
+        const errorMessage = err.issues[0].message;
+        errors.body = errorMessage;
+      }
+
+      if (errors) return errors;
+    },
+    onSubmit: (values) => {
+      const blogData = {
+        title: values.title,
+        description: values.description,
+        tags: [...values.tags.split(",")],
+        body: values.body,
+      };
+      console.log("dispatching", blogData);
+      dispatch(createBlog(blogData));
+    },
+  });
+  useEffect(() => {
+    if (!user) {
+      router.push("/login");
+    } else setLogin(true);
+  }, [user, router]);
   return (
     <>
       <Header currentTab="createblog" />
       <div className="flex flex-col items-center justify-center">
         <div className="text-6xl m-16">Create A Blog</div>
-        <div className="flex w-2/5 flex-col gap-4 mx-auto">
+        <form
+          onSubmit={formik.handleSubmit}
+          className="flex w-2/5 flex-col gap-4 mx-auto"
+        >
           <div>
             <label htmlFor="title" className="text-xl font-semibold">
               Blog Title
@@ -24,7 +95,15 @@ const Createblog = () => {
               id="title"
               className="w-full px-4 py-2 mt-1 text-gray-800 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder="Enter blog title"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.title}
             />
+            {formik.touched.title && formik.errors.title ? (
+              <div className="text-red-500 text-sm m-1">
+                {formik.errors.title}
+              </div>
+            ) : null}
           </div>
           <div>
             <label htmlFor="tags" className="text-xl font-semibold">
@@ -35,7 +114,15 @@ const Createblog = () => {
               id="tags"
               className="w-full px-4 py-2 mt-1 text-gray-800 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder="Enter related tags"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.tags}
             />
+            {formik.touched.tags && formik.errors.tags ? (
+              <div className="text-red-500 text-sm m-1">
+                {formik.errors.tags}
+              </div>
+            ) : null}
           </div>
 
           <div>
@@ -47,7 +134,15 @@ const Createblog = () => {
               id="description"
               className="w-full px-4 py-2 mt-1 text-gray-800 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder="Enter blog description"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.description}
             />
+            {formik.touched.description && formik.errors.description ? (
+              <div className="text-red-500 text-sm m-1">
+                {formik.errors.description}
+              </div>
+            ) : null}
           </div>
 
           <div>
@@ -59,12 +154,20 @@ const Createblog = () => {
               className="w-full px-4 py-2 mt-1 text-gray-800 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder="Enter blog content"
               rows="6"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.body}
             ></textarea>
+            {formik.touched.body && formik.errors.body ? (
+              <div className="text-red-500 text-sm m-1">
+                {formik.errors.body}
+              </div>
+            ) : null}
           </div>
-          <button className="w-full h-12 text-xl text-white bg-slate-600 rounded-lg">
+          <button className="w-full h-12 text-xl text-white bg-indigo-500 rounded-lg">
             SUBMIT
           </button>
-        </div>
+        </form>
       </div>
     </>
   );

@@ -45,14 +45,17 @@ const deleteBlog = asyncHandler(async (req, res) => {
 });
 
 const postBlog = asyncHandler(async (req, res) => {
-  if (!(req.body.text && req.body.title)) {
+  if (!(req.body.body && req.body.title)) {
     res.status(400);
+    console.log("Please fill all fields");
     throw new Error("Please fill all fields!");
   }
   const blog = await Blogs.create({
     user: req.user.id,
     title: req.body.title,
-    text: req.body.text,
+    description: req.body.description,
+    tags: req.body.tags,
+    body: req.body.body,
   });
   res.status(200).json(blog);
 });

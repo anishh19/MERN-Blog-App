@@ -9,9 +9,10 @@ const Dashboard = () => {
   const [isLoggedIn, setLogin] = useState(false);
   useEffect(() => {
     if (!user) {
+      console.log(user);
       router.push("/login");
     } else setLogin(true);
-  }, [user, router]);
+  }, []);
   return (
     <>
       <Header />
