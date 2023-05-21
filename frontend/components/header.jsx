@@ -74,7 +74,7 @@ function Header({ currentTab }) {
           <div class="-ml-8 hidden flex-col gap-2.5 sm:flex-row sm:justify-center lg:flex lg:justify-start">
             <Link
               href="/profile"
-              class="inline-block rounded-lg px-4 py-3 text-center text-sm font-semibold text-gray-500 outline-none ring-indigo-300 transition duration-100 hover:text-indigo-500 focus-visible:ring active:text-indigo-600 md:text-base"
+              className="inline-block rounded-lg bg-indigo-500 px-8 py-3 text-center text-sm font-semibold text-white outline-none  hover:bg-indigo-600  md:text-base"
             >
               Profile
             </Link>
@@ -89,7 +89,7 @@ function Header({ currentTab }) {
               onClick={() => {
                 onLogout();
               }}
-              className="inline-block rounded-lg bg-indigo-500 px-8 py-3 text-center text-sm font-semibold text-white outline-none  hover:bg-red-600 md:text-base"
+              class="inline-block rounded-lg px-4 py-3 text-center text-sm font-semibold text-gray-500 outline-none transition duration-100 hover:text-red-500 focus-visible:ring active:text-indigo-600 md:text-base"
             >
               Logout
             </button>

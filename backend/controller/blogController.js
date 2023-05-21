@@ -56,6 +56,7 @@ const postBlog = asyncHandler(async (req, res) => {
     description: req.body.description,
     tags: req.body.tags,
     body: req.body.body,
+    thumbnailURL: req.body.thumbnailURL,
   });
   res.status(200).json(blog);
 });

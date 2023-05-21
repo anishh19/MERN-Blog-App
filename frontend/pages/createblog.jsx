@@ -5,6 +5,9 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import { createBlog } from "../redux/blogs/blogSlice";
+import { toast } from "react-toastify";
+import { UploadButton } from "@uploadthing/react";
+import "@uploadthing/react/styles.css";
 
 const BlogFormSchema = z.object({
   title: z.string().min(1, { message: "Please add a title to your blog!" }),
@@ -18,6 +21,7 @@ const Createblog = () => {
   const router = useRouter();
   const { user } = useSelector((state) => state.auth);
   const [isLoggedIn, setLogin] = useState(false);
+  const [imageURL, setURL] = useState(null);
   const formik = useFormik({
     initialValues: {
       title: "",
@@ -62,14 +66,18 @@ const Createblog = () => {
       if (errors) return errors;
     },
     onSubmit: (values) => {
-      const blogData = {
-        title: values.title,
-        description: values.description,
-        tags: [...values.tags.split(",")],
-        body: values.body,
-      };
-      console.log("dispatching", blogData);
-      dispatch(createBlog(blogData));
+      if (!imageURL) {
+        toast.error("Please upload an image");
+      } else {
+        const blogData = {
+          title: values.title,
+          description: values.description,
+          tags: [...values.tags.split(",")],
+          body: values.body,
+          thumbnailURL: imageURL,
+        };
+        dispatch(createBlog(blogData));
+      }
     },
   });
   useEffect(() => {
@@ -143,6 +151,22 @@ const Createblog = () => {
                 {formik.errors.description}
               </div>
             ) : null}
+          </div>
+          <div className="flex flex-col items-start">
+            <div className="text-xl font-semibold my-4">
+              Please upload a thumbnail/image for your blog
+            </div>
+
+            <UploadButton
+              endpoint="imageUploader"
+              onClientUploadComplete={(res) => {
+                // console.log(res[0].fileUrl);
+                setURL(res[0].fileUrl);
+              }}
+              onUploadError={(error) => {
+                alert(`ERROR! ${error.message}`);
+              }}
+            />
           </div>
 
           <div>

@@ -11,6 +11,10 @@ const blogSchema = mongoose.Schema(
       type: String,
       required: [true, "Please add a title to your blog!"],
     },
+    description: {
+      type: String,
+      required: [true, "Please add a description to your blog!"],
+    },
     tags: {
       type: [String],
       required: true,
@@ -18,6 +22,10 @@ const blogSchema = mongoose.Schema(
     body: {
       type: String,
       required: [true, "Please add content to your blog!"],
+    },
+    thumbnailURL: {
+      type: String,
+      required: [true, "Please upload a thumbnail for your blog!"],
     },
   },
   {

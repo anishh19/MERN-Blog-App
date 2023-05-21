@@ -1,3 +1,9 @@
+const nextConfig = {
+  experimental: {
+    esmExternals: false, // THIS IS THE FLAG THAT MATTERS
+  },
+};
+
 module.exports = () => {
   const rewrites = () => {
     return [
@@ -7,7 +13,9 @@ module.exports = () => {
       },
     ];
   };
+
   return {
     rewrites,
+    ...nextConfig, // Merge the nextConfig object into the returned object
   };
 };
