@@ -50,6 +50,7 @@ const postBlog = asyncHandler(async (req, res) => {
     console.log("Please fill all fields");
     throw new Error("Please fill all fields!");
   }
+
   const blog = await Blogs.create({
     user: req.user.id,
     title: req.body.title,
@@ -57,6 +58,7 @@ const postBlog = asyncHandler(async (req, res) => {
     tags: req.body.tags,
     body: req.body.body,
     thumbnailURL: req.body.thumbnailURL,
+    creator: req.user.name,
   });
   res.status(200).json(blog);
 });

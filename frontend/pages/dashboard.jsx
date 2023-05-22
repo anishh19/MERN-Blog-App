@@ -12,7 +12,7 @@ const Dashboard = () => {
       console.log(user);
       router.push("/login");
     } else setLogin(true);
-  }, []);
+  }, [user, router]);
   return (
     <>
       <Header />

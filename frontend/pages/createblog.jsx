@@ -156,17 +156,21 @@ const Createblog = () => {
             <div className="text-xl font-semibold my-4">
               Please upload a thumbnail/image for your blog
             </div>
-
-            <UploadButton
-              endpoint="imageUploader"
-              onClientUploadComplete={(res) => {
-                // console.log(res[0].fileUrl);
-                setURL(res[0].fileUrl);
-              }}
-              onUploadError={(error) => {
-                alert(`ERROR! ${error.message}`);
-              }}
-            />
+            {imageURL ? (
+              <div>Image has been uploaded</div>
+            ) : (
+              <UploadButton
+                endpoint="imageUploader"
+                onClientUploadComplete={(res) => {
+                  console.log(res);
+                  setURL(res[0].fileUrl);
+                }}
+                onUploadError={(error) => {
+                  alert(`ERROR! ${error.message}`);
+                }}
+                className=""
+              />
+            )}
           </div>
 
           <div>

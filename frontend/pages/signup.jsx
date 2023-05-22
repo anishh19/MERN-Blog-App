@@ -13,6 +13,7 @@ const SignUpFormSchema = z.object({
     .string()
     .min(1, { message: "Email is required!" })
     .email({ message: "Invalid email address!" }),
+  userName: z.string().min(1, { message: "Email is required!" }),
   password: z
     .string()
     .min(1, { message: "Password is required!" })
@@ -63,9 +64,11 @@ function Signup() {
         const errorMessage = err.issues[0].message;
         errors.password = errorMessage;
       }
+
       if (values.password != values.repeatPassword) {
         errors.repeatPassword = "Passwords do not match";
       }
+
       if (errors) return errors;
     },
     onSubmit: (values) => {

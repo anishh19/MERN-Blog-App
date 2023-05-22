@@ -27,6 +27,10 @@ const blogSchema = mongoose.Schema(
       type: String,
       required: [true, "Please upload a thumbnail for your blog!"],
     },
+    creator: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,

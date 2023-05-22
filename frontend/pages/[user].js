@@ -35,7 +35,6 @@ const User = ({ data }) => {
 export default User;
 
 export async function getStaticPaths() {
-  //fetch available categories
   return {
     paths: [{ params: { user: "6465d610b460b412b193e576" } }],
     fallback: false,
