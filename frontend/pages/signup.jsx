@@ -1,5 +1,6 @@
 import Header from "../components/header";
-import { useEffect } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
@@ -13,7 +14,7 @@ const SignUpFormSchema = z.object({
     .string()
     .min(1, { message: "Email is required!" })
     .email({ message: "Invalid email address!" }),
-  userName: z.string().min(1, { message: "Email is required!" }),
+  username: z.string().min(1, { message: "Username is required!" }),
   password: z
     .string()
     .min(1, { message: "Password is required!" })
@@ -24,6 +25,7 @@ const SignUpFormSchema = z.object({
 function Signup() {
   const router = useRouter();
   const dispatch = useDispatch();
+  const [userNameStatus, setUserNameStatus] = useState("");
 
   const { user, isLoading, isError, isSuccess, message } = useSelector(
     (state) => state.auth
@@ -32,12 +34,14 @@ function Signup() {
     initialValues: {
       name: "",
       email: "",
+      username: "",
       password: "",
       repeatPassword: "",
     },
     initialErrors: {
       name: "",
       email: "",
+      username: "",
       password: "",
       repeatPassword: "",
     },
@@ -49,6 +53,23 @@ function Signup() {
       } catch (err) {
         const errorMessage = err.issues[0].message;
         errors.email = errorMessage;
+      }
+      async function asyncCall() {
+        const userData = {
+          username: values.username,
+        };
+        const response = await axios.post(
+          "http://localhost:5000/api/users/username",
+          userData
+        );
+        setUserNameStatus(response.data.message);
+      }
+      try {
+        SignUpFormSchema.shape.username.parse(values.username);
+        asyncCall();
+      } catch (err) {
+        const errorMessage = err.issues[0].message;
+        errors.username = errorMessage;
       }
 
       try {
@@ -75,6 +96,7 @@ function Signup() {
       const userData = {
         name: values.name,
         email: values.email,
+        username: values.username,
         password: values.password,
       };
       dispatch(register(userData));
@@ -95,7 +117,7 @@ function Signup() {
     <div className="h-full w-screen text-gray-500">
       <Header currentTab="signup" />
 
-      <div className=" w-full flex flex-col items-center justify-center gap-2">
+      <div className=" w-full flex flex-col items-center justify-center gap-1">
         <h1 className="text-6xl text-indigo-500 py-4">WELCOME </h1>
         <form
           className="flex text-xl flex-col w-[80] gap-1"
@@ -104,7 +126,7 @@ function Signup() {
           <div className="flex flex-col">
             <label className="m-2">Name</label>
             <input
-              className="border-2 border-black p-2 w-96"
+              className="border-2 border-black px-2 py-1 w-96"
               type="text"
               id="name"
               name="name"
@@ -122,7 +144,7 @@ function Signup() {
           <div className="flex flex-col">
             <label className="m-2">Email</label>
             <input
-              className="border-2 border-black p-2"
+              className="border-2 border-black px-2 py-1"
               type="email"
               id="email"
               name="email"
@@ -137,11 +159,32 @@ function Signup() {
               </div>
             ) : null}
           </div>
+          <div className="flex flex-col">
+            <label className="m-2">Username</label>
+            <input
+              className="border-2 border-black px-2 py-1"
+              type="text"
+              id="username"
+              name="username"
+              placeholder="Enter username"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.username}
+            ></input>
+            {formik.touched.username && formik.errors.username ? (
+              <div className="text-red-500 text-sm m-1">
+                {formik.errors.username}
+              </div>
+            ) : null}
+            {formik.touched.username && !formik.errors.username ? (
+              <div className="text-sm m-1">{userNameStatus}</div>
+            ) : null}
+          </div>
 
           <div className="flex flex-col">
             <label className="m-2">Password</label>
             <input
-              className="border-2 border-black p-2"
+              className="border-2 border-black px-2 py-1"
               type="password"
               id="password"
               name="password"
@@ -160,7 +203,7 @@ function Signup() {
           <div className="flex flex-col">
             <label className="m-2">Confirm Password</label>
             <input
-              className="border-2 border-black p-2"
+              className="border-2 border-black px-2 py-1"
               type="password"
               id="repeatPassword"
               name="repeatPassword"

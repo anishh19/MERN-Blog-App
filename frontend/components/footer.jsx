@@ -47,7 +47,7 @@ const Footer = () => {
             <Link
               href="#"
               target="_blank"
-              class="text-gray-400 transition duration-100 hover:text-gray-500 active:text-gray-600"
+              className="text-gray-400 transition duration-100 hover:text-gray-500 active:text-gray-600"
             >
               <svg
                 class="h-5 w-5"

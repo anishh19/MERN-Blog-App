@@ -77,6 +77,7 @@ const Createblog = () => {
           thumbnailURL: imageURL,
         };
         dispatch(createBlog(blogData));
+        router.push("/blogs/");
       }
     },
   });

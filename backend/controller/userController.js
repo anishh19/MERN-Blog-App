@@ -4,15 +4,19 @@ const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
 
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
-  if (!name || !email || !password) {
+  const { name, email, username, password } = req.body;
+  if (!name || !email || !password || !username) {
     res.status(400).json({ message: "Enter all data" });
   } else {
     //check if user exists
     const userExists = await User.findOne({ email: email });
+    const usernameExists = await User.findOne({ username: username });
     if (userExists) {
       res.status(400);
       throw new Error((message = "User Already Exists"));
+    } else if (usernameExists) {
+      res.status(400);
+      throw new Error((message = "Username Already Taken"));
     } else {
       //hash password
       const salt = await bcrypt.genSalt(10);
@@ -21,6 +25,7 @@ const registerUser = asyncHandler(async (req, res) => {
       const user = await User.create({
         name: name,
         email: email,
+        username: username,
         password: hashedPassword,
       });
 
@@ -29,6 +34,7 @@ const registerUser = asyncHandler(async (req, res) => {
           _id: user.ID,
           name: user.name,
           email: user.email,
+          username: user.username,
           token: generateToken(user._id),
         });
       } else {
@@ -64,6 +70,18 @@ const getMe = asyncHandler(async (req, res) => {
   });
 });
 
+const checkUsername = asyncHandler(async (req, res) => {
+  const { username } = req.body;
+  const usernameExists = await User.findOne({ username: username });
+  if (usernameExists) {
+    res.status(200).json({
+      message: "❌ Username Already Taken, please try another one ",
+    });
+  } else {
+    res.status(200).json({ message: "✅ Username Available " });
+  }
+});
+
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_secret, {
     expiresIn: "20d",
@@ -74,4 +92,5 @@ module.exports = {
   registerUser,
   getMe,
   loginUser,
+  checkUsername,
 };
